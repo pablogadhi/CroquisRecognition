@@ -15,4 +15,4 @@ def feed_forward(X, h_weights, o_weights):
     a_h_biased = np.vstack((a_h, bias(a_h)))
     z_o = a_h_biased @ o_weights
     a_o = vectorized_func(z_o, sigmoid)
-    return a_h, a_o
+    return z_h, z_o, a_h, a_o
