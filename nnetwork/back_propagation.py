@@ -1,5 +1,5 @@
 from .feed_forward import feed_forward
-from .utils import vectorized_func, sigmoid_d
+from .utils import vectorized_func, sigmoid_d, cost
 
 
 def back_propagation(X, Y, h_weights, o_weights):
@@ -15,10 +15,12 @@ def back_propagation(X, Y, h_weights, o_weights):
     rows, cols = z_h.shape
     z_h = z_h[:rows - 1, :]
 
-    delta_o = (Y - a_o) * vectorized_func(z_o, sigmoid_d)
+    delta_o = (a_o - Y) * vectorized_func(z_o, sigmoid_d)
     delta_h = (delta_o @ o_weights.T) * vectorized_func(z_h, sigmoid_d)
 
     gradient_o = a_h.T @ delta_o
     gradient_h = X.T @ delta_h
+
+    print(cost(a_o, Y))
 
     return gradient_h, gradient_o
