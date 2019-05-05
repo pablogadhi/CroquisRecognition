@@ -2,25 +2,28 @@ from .feed_forward import feed_forward
 from .utils import vectorized_func, sigmoid_d, cost
 
 
-def back_propagation(X, Y, h_weights, o_weights):
-    z_h, z_o, a_h, a_o = feed_forward(X, h_weights, o_weights)
+def back_propagation(X, Y, weights):
+    Z, A = feed_forward(X, weights)
 
-    # Delete all biases
-    rows, cols = a_o.shape
-    a_o = a_o[:rows - 2, :]
-    rows, cols = z_o.shape
-    z_o = z_o[:rows - 2, :]
-    rows, cols = a_h.shape
-    a_h = a_h[:rows - 1, :]
-    rows, cols = z_h.shape
-    z_h = z_h[:rows - 1, :]
+    layers = len(Z)
 
-    delta_o = (a_o - Y) * vectorized_func(z_o, sigmoid_d)
-    delta_h = (delta_o @ o_weights.T) * vectorized_func(z_h, sigmoid_d)
+    # Delete biases
+    for index, z, a in zip(range(0, layers), Z, A):
+        rows, cols = z.shape
+        Z[index] = z[:rows - index - 1, :]
+        A[index] = a[:rows - index - 1, :]
 
-    gradient_o = a_h.T @ delta_o
-    gradient_h = X.T @ delta_h
+    delta = (A[layers - 1] - Y) * vectorized_func(Z[layers - 1], sigmoid_d)
+    gradient_o = A[layers - 2].T @ delta
 
-    print(cost(a_o, Y))
+    gradients = [gradient_o]
+    A.insert(0, X)
 
-    return gradient_h, gradient_o
+    for i in range(layers - 2, -1, -1):
+        delta = (delta @ weights[i + 1].T) * vectorized_func(Z[i], sigmoid_d)
+        gradient_h = A[i].T @ delta
+        gradients.insert(0, gradient_h)
+
+    print(cost(A[layers], Y))
+
+    return gradients

@@ -7,12 +7,21 @@ def bias(X):
     return np.full((1, cols), 1)
 
 
-def feed_forward(X, h_weights, o_weights):
-    X_biased = np.vstack((X, bias(X)))
-    z_h = X_biased @ h_weights
-    a_h = vectorized_func(z_h, sigmoid)
+def feed_forward(X, weights):
+    layers = len(weights) + 1
 
-    a_h_biased = np.vstack((a_h, bias(a_h)))
-    z_o = a_h_biased @ o_weights
-    a_o = vectorized_func(z_o, sigmoid)
-    return z_h, z_o, a_h, a_o
+    X_biased = np.vstack((X, bias(X)))
+    z_h1 = X_biased @ weights[0]
+    a_h1 = vectorized_func(z_h1, sigmoid)
+
+    Z = [z_h1]
+    A = [a_h1]
+
+    for i in range(0, layers - 2):
+        a_h_biased = np.vstack((A[i], bias(A[i])))
+        z = a_h_biased @ weights[i + 1]
+        a = vectorized_func(z, sigmoid)
+        Z.append(z)
+        A.append(a)
+
+    return Z, A

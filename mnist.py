@@ -2,8 +2,8 @@ from mlxtend.data import loadlocal_mnist
 import numpy as np
 import sys
 from nnetwork.gradient_descent import gradient_descent
+from nnetwork.back_propagation import back_propagation
 from nnetwork.utils import normalize_matrix
-from nnetwork.feed_forward import feed_forward
 
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -14,6 +14,8 @@ X, Y = loadlocal_mnist(
 h_weights = np.random.rand(784, 14)
 o_weights = np.random.rand(14, 10)
 
+weights = np.array([h_weights, o_weights])
+
 y_dummy = np.zeros((Y.size, 10))
 
 for i, v in enumerate(Y):
@@ -21,4 +23,5 @@ for i, v in enumerate(Y):
 
 normalized_X = normalize_matrix(X, 0, 255)
 
-gradient_descent(X, y_dummy, h_weights, o_weights, 300, 3)
+gradient_descent(X, y_dummy, weights, 300, 3, back_propagation)
+# np.save('weights.npy', weights)
