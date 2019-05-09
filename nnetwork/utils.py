@@ -10,13 +10,13 @@ def vectorized_func(X, func):
 
 
 def sigmoid(x):
-    # if x < 0:
-    #     return 1 - (1 / (1 + exp(x)))
+    if x < 0:
+        return 1 - (1 / (1 + exp(x)))
     return 1 / (1 + exp(-x))
 
 
-def sigmoid_d(x):
-    return sigmoid(x) * (1 - sigmoid(x))
+def sigmoid_d(a):
+    return a * (1 - a)
 
 
 def normalize(x, min, max):
@@ -33,3 +33,16 @@ def cost(pred, Y):
     rows, cols = Y.shape
     diff_squared = (pred - Y) ** 2
     return 1 / (2 * rows) * np.sum(diff_squared)
+
+
+def score(real_red, Y):
+    diff = real_red - Y
+    return np.count_nonzero(diff == 0) / Y.shape[0]
+
+
+def confidence_and_prediction(dummy_pred):
+    results = []
+    for row in dummy_pred:
+        max = np.argmax(row)
+        results.append((row[max], max))
+    return results

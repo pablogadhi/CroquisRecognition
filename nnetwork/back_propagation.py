@@ -3,27 +3,22 @@ from .utils import vectorized_func, sigmoid_d, cost
 
 
 def back_propagation(X, Y, weights):
-    Z, A = feed_forward(X, weights)
+    A = feed_forward(X, weights)
 
-    layers = len(Z)
+    layers = len(A)
+    rows, cols = X.shape
 
-    # Delete biases
-    for index, z, a in zip(range(0, layers), Z, A):
-        rows, cols = z.shape
-        Z[index] = z[:rows - index - 1, :]
-        A[index] = a[:rows - index - 1, :]
-
-    delta = (A[layers - 1] - Y) * vectorized_func(Z[layers - 1], sigmoid_d)
-    gradient_o = A[layers - 2].T @ delta
+    delta = (A[layers - 1] - Y)
+    gradient_o = (1 / rows) * (A[layers - 2].T @ delta)
 
     gradients = [gradient_o]
-    A.insert(0, X)
 
-    for i in range(layers - 2, -1, -1):
-        delta = (delta @ weights[i + 1].T) * vectorized_func(Z[i], sigmoid_d)
-        gradient_h = A[i].T @ delta
+    for i in range(2, layers):
+        sgd = vectorized_func(A[-i][:, 1:], sigmoid_d)
+        delta = (delta @ weights[-i + 1].T[:, 1:]) * sgd
+        gradient_h = (1 / rows) * (A[-i - 1].T @ delta)
         gradients.insert(0, gradient_h)
 
-    print(cost(A[layers], Y))
+    print(cost(A[layers - 1], Y))
 
     return gradients
