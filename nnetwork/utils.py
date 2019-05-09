@@ -29,14 +29,27 @@ def normalize_matrix(X, min, max):
     return n_func(X.ravel(), min, max).reshape(rows, cols)
 
 
+def cross_entropy(y_p, y):
+    if y == 1:
+        return -log(y_p)
+    else:
+        return -log(1 - y_p)
+
+
 def cost(pred, Y):
-    rows, cols = Y.shape
-    diff_squared = (pred - Y) ** 2
-    return 1 / (2 * rows) * np.sum(diff_squared)
+    ce_func = np.vectorize(cross_entropy)
+    ce_results = ce_func(pred, Y)
+    return ce_results.ravel().sum() / Y.size
 
 
-def score(real_red, Y):
-    diff = real_red - Y
+# def cost(pred, Y):
+#     rows, cols = Y.shape
+#     diff_squared = (pred - Y) ** 2
+#     return 1 / (2 * rows) * np.sum(diff_squared)
+
+
+def score(real_pred, Y):
+    diff = real_pred - Y
     return np.count_nonzero(diff == 0) / Y.shape[0]
 
 
